@@ -27,25 +27,14 @@ class KelompokResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('nama_kelompok')
+                Forms\Components\TextInput::make('nama_kelompok')
                     ->required()
-                    ->label('Nama Kelompok'),
-
-                Select::make('hari')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('hari')
                     ->required()
-                    ->options([
-                        'Senin' => 'Senin',
-                        'Selasa' => 'Selasa',
-                        'Rabu' => 'Rabu',
-                        'Kamis' => 'Kamis',
-                        'Jumat' => 'Jumat',
-                        'Sabtu' => 'Sabtu',
-                        'Minggu' => 'Minggu',
-                    ]),
-
-                TimePicker::make('jam')
-                    ->required()
-                    ->label('Jam Mulai'),
+                    ->maxLength(50),
+                Forms\Components\TimePicker::make('jam')
+                    ->required(),
             ]);
     }
 
@@ -53,9 +42,10 @@ class KelompokResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('nama_kelompok')->label('Nama Kelompok')->searchable(),
-                TextColumn::make('hari')->sortable(),
-                TextColumn::make('jam')->label('Jam')->sortable(),
+                Tables\Columns\TextColumn::make('nama_kelompok')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('hari')->sortable(),
+                Tables\Columns\TextColumn::make('jam')->label('Jam Mulai')->sortable(),
+                Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
             ])
             // ->defaultSort('nama_kelompok');
             ->filters([

@@ -5,16 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Rekap extends Model
+class Registration extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'student_id',
-        'jadwal_id',
-        'absen',
-        'score',
-        'keterangan',
+        'kelompok_id',
+        'status',
     ];
 
     public function student()
@@ -22,8 +20,8 @@ class Rekap extends Model
         return $this->belongsTo(Student::class);
     }
 
-    public function jadwal()
+    public function kelompok()
     {
-        return $this->belongsTo(Jadwal::class);
+        return $this->belongsTo(Kelompok::class);
     }
 }

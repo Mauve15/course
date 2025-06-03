@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Inertia\Inertia;
 use App\Models\Jadwal;
 use Illuminate\Http\Request;
 
@@ -12,10 +13,15 @@ class JadwalController extends Controller
      */
     public function index()
     {
+        // Pastikan eager load relasi kelompok (dan guru jika perlu)
         $jadwals = Jadwal::with(['kelompok', 'user'])->get();
 
-        return response()->json($jadwals);
+        return Inertia::render('jadwal', [
+            'jadwals' => Jadwal::with(['kelompok', 'user:id,name'])->get(),
+        ]);
     }
+
+
 
     /**
      * Show the form for creating a new resource.

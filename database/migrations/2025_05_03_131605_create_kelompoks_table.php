@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('kelompoks', function (Blueprint $table) {
             $table->id();
             $table->string('nama_kelompok');
-            $table->string('hari');
-            $table->string('jam');
+            $table->string('hari'); // bisa diubah jadi enum jika terbatas
+            $table->time('jam');
             $table->timestamps();
         });
     }

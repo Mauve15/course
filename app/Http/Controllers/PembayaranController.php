@@ -1,5 +1,6 @@
 <?php
-// app/Http/Controllers/PembayaranController.php
+
+//app/Http/Controllers/PembayaranController.php
 
 namespace App\Http\Controllers;
 
@@ -8,20 +9,26 @@ use Illuminate\Http\Request;
 
 class PembayaranController extends Controller
 {
+    // Display a listing of the resource
     public function index()
     {
+        // Fetch pembayaran data along with the related student data
         $pembayarans = Pembayaran::with('student')->get();
+        $bulanList = Pembayaran::select('bulan')->distinct()->pluck('bulan');
+        $statusList = Pembayaran::select('status')->distinct()->pluck('status');
 
-        return response()->json($pembayarans);
+        // Return the data as JSON for the frontend
+        return inertia('pembayaran', [
+            'pembayaran' => $pembayarans,
+            'bulanList' => $bulanList,
+            'statusList' => $statusList,
+        ]);
     }
 
-    public function create()
-    {
-        return response()->json(['message' => 'Silakan isi data pembayaran']);
-    }
-
+    // Store a newly created resource
     public function store(Request $request)
     {
+        // Validate the input data
         $request->validate([
             'bulan' => 'required|string',
             'status' => 'required|string',
@@ -29,39 +36,12 @@ class PembayaranController extends Controller
             'nominal' => 'required|numeric',
         ]);
 
+        // Create new payment record
         $pembayaran = Pembayaran::create($request->all());
 
-        return response()->json($pembayaran, 201);
+        // Return the created payment data
+        return redirect()->route('pembayaran.index');
     }
 
-    public function show(Pembayaran $pembayaran)
-    {
-        return response()->json($pembayaran);
-    }
-
-    public function edit(Pembayaran $pembayaran)
-    {
-        return response()->json($pembayaran);
-    }
-
-    public function update(Request $request, Pembayaran $pembayaran)
-    {
-        $request->validate([
-            'bulan' => 'required|string',
-            'status' => 'required|string',
-            'student_id' => 'required|exists:students,id',
-            'nominal' => 'required|numeric',
-        ]);
-
-        $pembayaran->update($request->all());
-
-        return response()->json($pembayaran);
-    }
-
-    public function destroy(Pembayaran $pembayaran)
-    {
-        $pembayaran->delete();
-
-        return response()->json(['message' => 'Pembayaran berhasil dihapus']);
-    }
+    // Other actions: show, edit, update, destroy (not included here for brevity)
 }

@@ -13,12 +13,11 @@ return new class extends Migration
     {
         Schema::create('rekaps', function (Blueprint $table) {
             $table->id();
-            $table->string('absen');
-            $table->string('score');
-            $table->string('keterangan');
-            $table->foreignId('student_id')->constrained('students', 'id');
-            $table->string('materi');
-            $table->foreignId('jadwal_id')->constrained('jadwals', 'id');
+            $table->foreignId('student_id')->constrained()->onDelete('cascade');
+            $table->foreignId('jadwal_id')->constrained()->onDelete('cascade');
+            $table->boolean('absen'); // bisa jadi boolean: hadir / tidak
+            $table->integer('score')->nullable(); // nilai boleh kosong
+            $table->string('keterangan')->nullable();
             $table->timestamps();
         });
     }

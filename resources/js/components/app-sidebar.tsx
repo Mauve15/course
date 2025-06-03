@@ -13,6 +13,21 @@ const mainNavItems: NavItem[] = [
         href: '/dashboard',
         icon: LayoutGrid,
     },
+    {
+        title: 'Student',
+        href: '/student',
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Jadwal',
+        href: '/jadwal',
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Pembayaran',
+        href: '/pembayaran',
+        icon: LayoutGrid,
+    },
 ];
 
 const footerNavItems: NavItem[] = [

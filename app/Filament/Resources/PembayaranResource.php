@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use Filament\Forms;
 use Filament\Tables;
+use App\Models\Student;
 use Filament\Forms\Form;
 use App\Models\Pembayaran;
 use Filament\Tables\Table;
@@ -26,27 +27,25 @@ class PembayaranResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('student_id')
+                Forms\Components\Select::make('student_id')
                     ->label('Siswa')
-                    ->relationship('student', 'nama')
-                    ->searchable()
+                    ->options(Student::all()->pluck('nama', 'id'))
                     ->required(),
-
-                TextInput::make('bulan')
-                    ->label('Bulan (MM-YYYY)')
-                    ->placeholder('05-2025')
-                    ->required(),
-
-                Select::make('status')
+                Forms\Components\DatePicker::make('bulan')
+                    ->required()
+                    ->displayFormat('F Y'),
+                Forms\Components\TextInput::make('nominal')
+                    ->required()
+                    ->numeric(),
+                Forms\Components\Select::make('status')
                     ->options([
                         'lunas' => 'Lunas',
-                        'belum' => 'Belum',
+                        'belum' => 'Belum Lunas',
                     ])
+                    ->default('belum')
                     ->required(),
-
-                TextInput::make('nominal')
-                    ->numeric()
-                    ->required(),
+                Forms\Components\Textarea::make('keterangan')
+                    ->maxLength(255),
             ]);
     }
 
@@ -54,11 +53,25 @@ class PembayaranResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('student.nama')->label('Siswa'),
-                TextColumn::make('bulan'),
-                TextColumn::make('status')->badge()
-                    ->color(fn(string $state) => $state === 'lunas' ? 'success' : 'danger'),
-                TextColumn::make('nominal')->money('IDR', true),
+                Tables\Columns\TextColumn::make('id')->label('ID')->sortable(),
+                Tables\Columns\TextColumn::make('student.nama')->label('Siswa')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('bulan')->label('Bulan')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('nominal')->label('Nominal')->money('idr', true),
+                Tables\Columns\TextColumn::make('status')
+                    ->formatStateUsing(fn($state) => [
+                        'lunas' => 'Lunas',
+                        'belum' => 'Belum Lunas',
+                    ][$state] ?? $state)
+                    ->badge() // opsional: jika ingin tampilan seperti badge
+                    ->color(fn($state) => match ($state) {
+                        'lunas' => 'success',
+                        'belum' => 'warning',
+                        default => 'gray',
+                    })
+                    ->label('Status'),
+
+                Tables\Columns\TextColumn::make('keterangan')->label('Keterangan'),
+                Tables\Columns\TextColumn::make('created_at')->dateTime()->label('Tanggal Bayar'),
             ])
             ->filters([
                 //

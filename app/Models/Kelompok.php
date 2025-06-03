@@ -9,11 +9,15 @@ class Kelompok extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nama_kelompok', 'hari', 'jam'];
+    protected $fillable = [
+        'nama_kelompok',
+        'hari',
+        'jam',
+    ];
 
-    public function students()
+    public function registrations()
     {
-        return $this->hasMany(Student::class);
+        return $this->hasMany(Registration::class);
     }
 
     public function jadwals()

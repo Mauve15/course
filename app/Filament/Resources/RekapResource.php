@@ -5,6 +5,8 @@ namespace App\Filament\Resources;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Rekap;
+use App\Models\Jadwal;
+use App\Models\Student;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
@@ -27,32 +29,22 @@ class RekapResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('student_id')
+                Forms\Components\Select::make('student_id')
                     ->label('Siswa')
-                    ->relationship('student', 'nama')
-                    ->required()
-                    ->searchable(),
-
-                Select::make('jadwal_id')
+                    ->options(Student::all()->pluck('nama', 'id'))
+                    ->required(),
+                Forms\Components\Select::make('jadwal_id')
                     ->label('Jadwal')
-                    ->relationship('jadwal', 'id') // atau bisa custom tampilkan kelompok & guru
+                    ->options(Jadwal::all()->pluck('materi', 'id'))
                     ->required(),
-
-                Select::make('absen')
-                    ->options([
-                        'hadir' => 'Hadir',
-                        'izin' => 'Izin',
-                        'alfa' => 'Alfa',
-                    ])
-                    ->required(),
-
-                TextInput::make('score')
-                    ->numeric()
-                    ->required(),
-
-                TextInput::make('materi')->required(),
-
-                Textarea::make('keterangan')->rows(2),
+                Forms\Components\TextInput::make('absen')
+                    ->required()
+                    ->numeric(),
+                Forms\Components\TextInput::make('score')
+                    ->required()
+                    ->numeric(),
+                Forms\Components\Textarea::make('keterangan')
+                    ->maxLength(255),
             ]);
     }
 
@@ -60,11 +52,13 @@ class RekapResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('student.nama')->label('Siswa')->searchable(),
-                TextColumn::make('jadwal.kelompok.nama_kelompok')->label('Kelompok'),
-                TextColumn::make('materi'),
-                TextColumn::make('absen'),
-                TextColumn::make('score'),
+                Tables\Columns\TextColumn::make('id')->label('ID')->sortable(),
+                Tables\Columns\TextColumn::make('student.nama')->label('Siswa')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('jadwal.materi')->label('Materi')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('absen')->label('Absen'),
+                Tables\Columns\TextColumn::make('score')->label('Nilai'),
+                Tables\Columns\TextColumn::make('keterangan')->label('Keterangan'),
+                Tables\Columns\TextColumn::make('created_at')->dateTime()->label('Tanggal'),
             ])
             ->filters([
                 //

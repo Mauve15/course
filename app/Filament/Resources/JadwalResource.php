@@ -3,8 +3,10 @@
 namespace App\Filament\Resources;
 
 use Filament\Forms;
+use App\Models\User;
 use Filament\Tables;
 use App\Models\Jadwal;
+use App\Models\Kelompok;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
@@ -25,17 +27,27 @@ class JadwalResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('kelompok_id')
+                Forms\Components\Select::make('kelompok_id')
                     ->label('Kelompok')
-                    ->relationship('kelompok', 'nama_kelompok')
+                    ->options(Kelompok::all()->pluck('nama_kelompok', 'id'))
                     ->required(),
-
-                Select::make('user_id')
-                    ->label('Guru')
-                    ->relationship('user', 'name')
+                Forms\Components\Select::make('user_id')
+                    ->label('Pengajar')
+                    ->options(User::all()->pluck('name', 'id'))
+                    ->required(),
+                Forms\Components\DatePicker::make('tanggal')
                     ->required()
-                    ->searchable()
-                    ->preload(),
+                    ->label('Tanggal')
+                    ->native(false)
+                    ->displayFormat('d F Y'),
+                Forms\Components\TimePicker::make('jam')
+                    ->required()
+                    ->label('Jam')
+                    ->native(false)
+                    ->displayFormat('H:i'),
+                Forms\Components\TextInput::make('materi')
+                    ->required()
+                    ->maxLength(255),
             ]);
     }
 
@@ -43,8 +55,11 @@ class JadwalResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('kelompok.nama_kelompok')->label('Kelompok')->searchable(),
-                TextColumn::make('user.name')->label('Guru')->searchable(),
+                Tables\Columns\TextColumn::make('id')->label('ID')->sortable(),
+                Tables\Columns\TextColumn::make('kelompok.nama_kelompok')->label('Kelompok')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('user.name')->label('Pengajar')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('materi')->label('Materi')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('created_at')->dateTime()->label('Dibuat'),
             ])
             ->filters([
                 //

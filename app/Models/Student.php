@@ -11,25 +11,34 @@ class Student extends Model
 
     protected $fillable = [
         'nama',
-        'tempat',
+        'alamat',
+        'tempat_lahir',
         'tanggal_lahir',
         'kelas',
         'asal_sekolah',
-        'kelompok_id'
+        'gender',
+        'contact',
+        'kelompok_id',
+
     ];
 
-    public function kelompok()
+    public function registrations()
     {
-        return $this->belongsTo(Kelompok::class);
+        return $this->hasMany(Registration::class);
     }
 
-    public function rekap()
+    public function rekaps()
     {
         return $this->hasMany(Rekap::class);
     }
 
-    public function pembayaran()
+    public function pembayarans()
     {
         return $this->hasMany(Pembayaran::class);
+    }
+
+    public function kelompok()
+    {
+        return $this->belongsTo(Kelompok::class);
     }
 }

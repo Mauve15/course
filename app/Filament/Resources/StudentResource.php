@@ -27,16 +27,36 @@ class StudentResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('nama')->required(),
-                TextInput::make('tempat')->label('Tempat Lahir')->required(),
-                DatePicker::make('tanggal_lahir')->required(),
-                TextInput::make('kelas')->required(),
-                TextInput::make('asal_sekolah')->required(),
 
-                Select::make('kelompok_id')
-                    ->label('Kelompok')
-                    ->relationship('kelompok', 'nama_kelompok')
+                Forms\Components\TextInput::make('nama')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\Textarea::make('alamat')
                     ->required(),
+                Forms\Components\TextInput::make('tempat_lahir')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\DatePicker::make('tanggal_lahir')
+                    ->required(),
+                Forms\Components\TextInput::make('kelas')
+                    ->required()
+                    ->maxLength(50),
+                Forms\Components\TextInput::make('asal_sekolah')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\Select::make('kelompok_id')
+                    ->label('Kelompok')
+                    ->required()
+                    ->relationship('kelompok', 'nama_kelompok'),
+                Forms\Components\Radio::make('gender')
+                    ->options([
+                        'L' => 'Laki-laki',
+                        'P' => 'Perempuan',
+                    ])
+                    ->required(),
+                Forms\Components\TextInput::make('contact')
+                    ->required()
+                    ->maxLength(50),
             ]);
     }
 
@@ -44,10 +64,13 @@ class StudentResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('nama')->searchable(),
-                TextColumn::make('kelas')->sortable(),
-                TextColumn::make('kelompok.nama_kelompok')->label('Kelompok'),
-                TextColumn::make('asal_sekolah')->label('Asal Sekolah'),
+                Tables\Columns\TextColumn::make('nama')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('kelas')->sortable(),
+                Tables\Columns\TextColumn::make('asal_sekolah')->limit(20),
+                Tables\Columns\TextColumn::make('kelompok.nama_kelompok')->label('Kelompok')->sortable(),
+                Tables\Columns\TextColumn::make('gender')->label('Jenis Kelamin'),
+                Tables\Columns\TextColumn::make('contact'),
+                Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
             ])
             ->filters([
                 //

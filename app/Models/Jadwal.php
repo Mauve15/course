@@ -9,7 +9,13 @@ class Jadwal extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['kelompok_id', 'user_id'];
+    protected $fillable = [
+        'kelompok_id',
+        'user_id',
+        'materi',
+        'tanggal',
+        'jam',
+    ];
 
     public function kelompok()
     {

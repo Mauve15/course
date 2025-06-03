@@ -16,8 +16,8 @@ class StudentController extends Controller
     {
         $students = Student::with('kelompok')->get();
 
-        return Inertia::render('Student/Index', [
-            'students' => $students
+        return Inertia::render('student', [
+            'students' => $students,
         ]);
     }
 
@@ -49,7 +49,7 @@ class StudentController extends Controller
 
         Student::create($request->all());
 
-        return redirect()->route('students.index')->with('message', 'Data siswa berhasil ditambahkan');
+        return redirect()->route('student.index')->with('message', 'Data siswa berhasil ditambahkan');
     }
 
     /**
@@ -83,7 +83,19 @@ class StudentController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'nama' => 'required',
+            'tempat' => 'required',
+            'tanggal_lahir' => 'required|date',
+            'kelas' => 'required',
+            'asal_sekolah' => 'required',
+            'kelompok_id' => 'required|exists:kelompoks,id',
+        ]);
+
+        $student = Student::findOrFail($id);
+        $student->update($request->all());
+
+        return redirect()->route('student.index')->with('message', 'Data siswa berhasil diperbarui');
     }
 
     /**
@@ -91,6 +103,9 @@ class StudentController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $student = Student::findOrFail($id);
+        $student->delete();
+
+        return redirect()->route('student.index')->with('message', 'Data siswa berhasil dihapus');
     }
 }
