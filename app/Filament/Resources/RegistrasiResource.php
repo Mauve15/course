@@ -37,10 +37,10 @@ class RegistrasiResource extends Resource
                 Forms\Components\Select::make('status')
                     ->label('Status')
                     ->options([
-                        'aktif' => 'Aktif',
-                        'selesai' => 'Selesai',
+                        'aktif' => 'aktif',
+                        'belum aktif' => 'belum aktif',
                     ])
-                    ->default('aktif')
+                    // ->default('aktif')
                     ->required(),
             ]);
     }
@@ -62,7 +62,7 @@ class RegistrasiResource extends Resource
                     ->badge()
                     ->color(fn($state) => match ($state) {
                         'aktif' => 'success',
-                        'selesai' => 'gray',
+                        'belum aktif' => 'gray',
                         default => 'secondary',
                     }),
                 Tables\Columns\TextColumn::make('created_at')

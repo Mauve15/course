@@ -7,6 +7,7 @@ use App\Http\Controllers\JadwalController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\KelompokController;
 use App\Http\Controllers\PembayaranController;
+use App\Http\Controllers\RegistrationController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -33,8 +34,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
-// routes/web.php
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/pendaftaran', [StudentController::class, 'create'])->name('create');
+    Route::post('/pendaftaran', [StudentController::class, 'store'])->name('store');
+});
+
+Route::get('/rekap', [RekapController::class, 'index'])->name('rekap.index')->middleware('auth');
+Route::get('/rekap/create', [RekapController::class, 'create'])->name('rekap.create')->middleware('auth');
+Route::post('/rekap', [RekapController::class, 'store'])->name('rekap.store')->middleware('auth');
+
+
+// routes/web.php
+Route::post('/register-kelas', [RegistrationController::class, 'store'])->middleware('auth');
 Route::prefix('pembayaran')->group(function () {
     // Menampilkan daftar pembayaran
     Route::get('/', [PembayaranController::class, 'index'])->name('pembayaran.index');

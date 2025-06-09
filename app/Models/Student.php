@@ -19,7 +19,7 @@ class Student extends Model
         'gender',
         'contact',
         'kelompok_id',
-
+        'user_id',
     ];
 
     public function registrations()
@@ -40,5 +40,9 @@ class Student extends Model
     public function kelompok()
     {
         return $this->belongsTo(Kelompok::class);
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

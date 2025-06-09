@@ -14,14 +14,15 @@ return new class extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->string('alamat');
+            $table->text('alamat');
             $table->string('tempat_lahir');
             $table->date('tanggal_lahir');
-            $table->string('kelas'); // atau jika ingin fix list: enum
+            $table->string('kelas');
             $table->string('asal_sekolah');
             $table->enum('gender', ['L', 'P']);
             $table->string('contact');
-            $table->foreignId('kelompok_id')->constrained()->onDelete('cascade'); // relasi ke kelompok
+            $table->foreignId('kelompok_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

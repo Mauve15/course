@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('nominal');
             $table->enum('status', ['lunas', 'belum'])->default('belum');
             $table->string('keterangan')->nullable();
+            $table->foreignId('jadwal_id')->nullable()->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

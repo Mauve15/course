@@ -52,7 +52,8 @@ class UserResource extends Resource
                     ->label('Role')
                     ->options([
                         'admin' => 'Admin',
-                        'guru' => 'Guru',
+                        'pengajar' => 'Pengajar',
+                        'siswa' => 'Siswa',
                     ])
                     ->required(),
             ]);

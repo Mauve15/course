@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_id')->constrained()->onDelete('cascade');
             $table->foreignId('jadwal_id')->constrained()->onDelete('cascade');
-            $table->boolean('absen'); // bisa jadi boolean: hadir / tidak
-            $table->integer('score')->nullable(); // nilai boleh kosong
+            $table->integer('absen')->nullable()->default(0);
+            $table->integer('score')->nullable();
             $table->string('keterangan')->nullable();
             $table->timestamps();
         });

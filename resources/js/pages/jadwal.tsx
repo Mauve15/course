@@ -12,8 +12,10 @@ interface Jadwal {
     user: {
       name: string;
     } | null;
+    pengajar: string | null;
+
   }
-  
+
 
 const breadcrumbs: BreadcrumbItem[] = [
   {

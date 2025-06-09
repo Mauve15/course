@@ -57,6 +57,10 @@ class StudentResource extends Resource
                 Forms\Components\TextInput::make('contact')
                     ->required()
                     ->maxLength(50),
+                Forms\Components\Select::make('user_id')
+                    ->label('Role User')
+                    // ->required()
+                    ->relationship('user', 'role'),
             ]);
     }
 
@@ -70,6 +74,7 @@ class StudentResource extends Resource
                 Tables\Columns\TextColumn::make('kelompok.nama_kelompok')->label('Kelompok')->sortable(),
                 Tables\Columns\TextColumn::make('gender')->label('Jenis Kelamin'),
                 Tables\Columns\TextColumn::make('contact'),
+                Tables\Columns\TextColumn::make('user.role')->label('User'),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
             ])
             ->filters([

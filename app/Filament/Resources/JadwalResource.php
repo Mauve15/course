@@ -31,20 +31,21 @@ class JadwalResource extends Resource
                     ->label('Kelompok')
                     ->options(Kelompok::all()->pluck('nama_kelompok', 'id'))
                     ->required(),
-                Forms\Components\Select::make('user_id')
+                Forms\Components\Select::make('pengajar')
                     ->label('Pengajar')
-                    ->options(User::all()->pluck('name', 'id'))
+                    ->options(User::where('role', 'pengajar')->pluck('name', 'id'))
                     ->required(),
-                Forms\Components\DatePicker::make('tanggal')
-                    ->required()
-                    ->label('Tanggal')
-                    ->native(false)
-                    ->displayFormat('d F Y'),
-                Forms\Components\TimePicker::make('jam')
-                    ->required()
-                    ->label('Jam')
-                    ->native(false)
-                    ->displayFormat('H:i'),
+
+                // Forms\Components\DatePicker::make('tanggal')
+                //     ->required()
+                //     ->label('Tanggal')
+                //     ->native(false)
+                //     ->displayFormat('d F Y'),
+                // Forms\Components\TimePicker::make('jam')
+                //     ->required()
+                //     ->label('Jam')
+                //     ->native(false)
+                //     ->displayFormat('H:i'),
                 Forms\Components\TextInput::make('materi')
                     ->required()
                     ->maxLength(255),
@@ -57,7 +58,8 @@ class JadwalResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')->label('ID')->sortable(),
                 Tables\Columns\TextColumn::make('kelompok.nama_kelompok')->label('Kelompok')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('user.name')->label('Pengajar')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('pengajarUser.name')->label('Pengajar'),
+
                 Tables\Columns\TextColumn::make('materi')->label('Materi')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->label('Dibuat'),
             ])

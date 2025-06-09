@@ -39,6 +39,7 @@ class JadwalController extends Controller
         $request->validate([
             'kelompok_id' => 'required|exists:kelompoks,id',
             'user_id' => 'required|exists:users,id',
+            'pengajar' => 'required|string|max:255',
         ]);
 
         $jadwal = Jadwal::create($request->all());

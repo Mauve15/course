@@ -11,10 +11,8 @@ class Jadwal extends Model
 
     protected $fillable = [
         'kelompok_id',
-        'user_id',
         'materi',
-        'tanggal',
-        'jam',
+        'pengajar',
     ];
 
     public function kelompok()
@@ -30,5 +28,10 @@ class Jadwal extends Model
     public function rekaps()
     {
         return $this->hasMany(Rekap::class);
+    }
+
+    public function pengajarUser()
+    {
+        return $this->belongsTo(User::class, 'pengajar');
     }
 }

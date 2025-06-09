@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Inertia\Inertia;
 use App\Models\Rekap;
+use App\Models\Jadwal;
+use App\Models\Student;
 use Illuminate\Http\Request;
 
 class RekapController extends Controller
@@ -10,39 +13,43 @@ class RekapController extends Controller
     /**
      * Display a listing of the resource.
      */
+    // di controller
     public function index()
     {
         $rekaps = Rekap::with(['student', 'jadwal'])->get();
+        $students = Student::select('id', 'nama')->get();
+        $jadwals = Jadwal::select('id', 'materi')->get();
 
-        return response()->json($rekaps);
+        return Inertia::render('rekap', [
+            'rekaps' => $rekaps,
+            'students' => $students,
+            'jadwals' => $jadwals,
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        return response()->json(['message' => 'Silakan isi data rekap']);
+        return Inertia::render('rekap', [
+            'students' => Student::select('id', 'name')->get(),
+            'jadwals' => Jadwal::select('id', 'name')->get(),
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
-            'absen' => 'required',
+            'absen' => 'required|integer|min:0',
             'score' => 'required|numeric',
             'keterangan' => 'nullable|string',
             'student_id' => 'required|exists:students,id',
-            'materi' => 'required|string',
             'jadwal_id' => 'required|exists:jadwals,id',
         ]);
 
-        $rekap = Rekap::create($request->all());
+        Rekap::create($request->all());
 
-        return response()->json($rekap, 201);
+        return redirect()->route('rekap.index')->with('success', 'Rekap berhasil disimpan');
     }
+
 
     /**
      * Display the specified resource.
@@ -69,11 +76,11 @@ class RekapController extends Controller
     {
         $rekap = Rekap::findOrFail($id);
         $request->validate([
-            'absen' => 'required',
+            'absen' => 'required|integer|min:0',
             'score' => 'required|numeric',
             'keterangan' => 'nullable|string',
             'student_id' => 'required|exists:students,id',
-            'materi' => 'required|string',
+            // 'materi' => 'required|string',
             'jadwal_id' => 'required|exists:jadwals,id',
         ]);
 

@@ -24,4 +24,8 @@ class Kelompok extends Model
     {
         return $this->hasMany(Jadwal::class);
     }
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
 }
