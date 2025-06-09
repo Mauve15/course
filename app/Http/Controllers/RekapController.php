@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use App\Models\Rekap;
 use App\Models\Jadwal;
 use App\Models\Student;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class RekapController extends Controller
@@ -13,9 +14,42 @@ class RekapController extends Controller
     /**
      * Display a listing of the resource.
      */
-    // di controller
     public function index()
     {
+        $user = Auth::user();
+
+        if ($user->role === 'siswa') {
+            $student = Student::where('user_id', $user->id)->first();
+
+            $rekaps = Rekap::with(['student', 'jadwal'])
+                ->where('student_id', $student->id)
+                ->get();
+
+            return Inertia::render('rekap', [
+                'rekaps' => $rekaps,
+                'students' => [],
+                'jadwals' => [],
+                'users' => $user,
+            ]);
+        }
+
+        if ($user->role === 'guru') {
+            $jadwals = Jadwal::where('pengajar', $user->id)->select('id', 'materi', 'kelompok_id')->get();
+            $kelompokIds = $jadwals->pluck('kelompok_id')->unique();
+            $students = Student::whereIn('kelompok_id', $kelompokIds)->select('id', 'nama')->get();
+            $rekaps = Rekap::with(['student', 'jadwal'])
+                ->whereHas('jadwal', fn($q) => $q->where('pengajar', $user->id))
+                ->get();
+
+            return Inertia::render('rekap', [
+                'rekaps' => $rekaps,
+                'students' => $students,
+                'jadwals' => $jadwals->makeHidden('kelompok_id'),
+                'users' => $user,
+            ]);
+        }
+
+        // === ADMIN ===
         $rekaps = Rekap::with(['student', 'jadwal'])->get();
         $students = Student::select('id', 'nama')->get();
         $jadwals = Jadwal::select('id', 'materi')->get();
@@ -24,14 +58,27 @@ class RekapController extends Controller
             'rekaps' => $rekaps,
             'students' => $students,
             'jadwals' => $jadwals,
+            'users' => $user,
         ]);
     }
 
+
+
     public function create()
     {
+        $user = Auth::user()->id;
+
+
+        // Ambil jadwal milik pengajar
+        $jadwals = Jadwal::where('pengajar', $user->id)->select('id', 'materi', 'kelompok_id')->get();
+        $kelompokIds = $jadwals->pluck('kelompok_id')->unique();
+
+        // Ambil siswa dari kelompok tersebut
+        $students = Student::whereIn('kelompok_id', $kelompokIds)->select('id', 'nama')->get();
+
         return Inertia::render('rekap', [
-            'students' => Student::select('id', 'name')->get(),
-            'jadwals' => Jadwal::select('id', 'name')->get(),
+            'students' => $students,
+            'jadwals' => $jadwals->makeHidden('kelompok_id'),
         ]);
     }
 
@@ -50,37 +97,27 @@ class RekapController extends Controller
         return redirect()->route('rekap.index')->with('success', 'Rekap berhasil disimpan');
     }
 
-
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         $rekap = Rekap::findOrFail($id);
         return response()->json($rekap);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         $rekap = Rekap::findOrFail($id);
         return response()->json($rekap);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $rekap = Rekap::findOrFail($id);
+
         $request->validate([
             'absen' => 'required|integer|min:0',
             'score' => 'required|numeric',
             'keterangan' => 'nullable|string',
             'student_id' => 'required|exists:students,id',
-            // 'materi' => 'required|string',
             'jadwal_id' => 'required|exists:jadwals,id',
         ]);
 
@@ -89,9 +126,6 @@ class RekapController extends Controller
         return response()->json($rekap);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         $rekap = Rekap::findOrFail($id);

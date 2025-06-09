@@ -5,12 +5,14 @@ import { type BreadcrumbItem } from '@/types';
 
 interface Payment {
   id: number;
-  bulan: string;
+  bulan: string; // sudah nama bulan, contoh: 'Juni'
   status: string;
   nominal: string;
   student: {
     nama: string;
   };
+  created_at: string;
+  // keterangan: string | null;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -21,17 +23,16 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Payment() {
-  const { pembayaran, bulanList, statusList } = usePage<{ 
-    pembayaran: Payment[] 
-    bulanList: string[] 
-    statusList: string[] 
+  const { pembayaran, bulanList, statusList } = usePage<{
+    pembayaran: Payment[];
+    bulanList: string[];
+    statusList: string[];
   }>().props;
 
   const [filteredPayments, setFilteredPayments] = useState<Payment[]>(pembayaran);
   const [selectedBulan, setSelectedBulan] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
 
-  // Filter data berdasarkan bulan dan status
   useEffect(() => {
     let filtered = pembayaran;
 
@@ -58,59 +59,66 @@ export default function Payment() {
           <div>
             <label htmlFor="bulan" className="block text-sm font-medium">Bulan</label>
             <select
-  id="bulan"
-  value={selectedBulan}
-  onChange={(e) => setSelectedBulan(e.target.value)}
-  className="mt-1 block w-full"
->
-  <option value="">Pilih Bulan</option>
-  {bulanList.map((bulan) => (
-    <option key={bulan} value={bulan}>{bulan}</option>
-  ))}
-</select>
-
+              id="bulan"
+              value={selectedBulan}
+              onChange={(e) => setSelectedBulan(e.target.value)}
+              className="mt-1 block w-full"
+            >
+              <option value="">Pilih Bulan</option>
+              {bulanList.map((bulan) => (
+                <option key={bulan} value={bulan}>{bulan}</option>
+              ))}
+            </select>
           </div>
 
           <div>
             <label htmlFor="status" className="block text-sm font-medium">Status</label>
             <select
-  id="status"
-  value={selectedStatus}
-  onChange={(e) => setSelectedStatus(e.target.value)}
-  className="mt-1 block w-full"
->
-  <option value="">Pilih Status</option>
-  {statusList.map((status) => (
-    <option key={status} value={status}>{status}</option>
-  ))}
-</select>
-
+              id="status"
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="mt-1 block w-full"
+            >
+              <option value="">Pilih Status</option>
+              {statusList.map((status) => (
+                <option key={status} value={status}>{status === 'lunas' ? 'Lunas' : 'Belum Lunas'}</option>
+              ))}
+            </select>
           </div>
         </div>
 
-        {/* Tabel Pembayaran */}
-        <div className="overflow-x-auto">
-          <table className="min-w-full table-auto border border-gray-300 dark:border-neutral-700">
-            <thead>
-              <tr className="bg-gray-100 dark:bg-neutral-800 text-left">
-                <th className="p-3 border">Nama Siswa</th>
-                <th className="p-3 border">Bulan</th>
-                <th className="p-3 border">Status</th>
-                <th className="p-3 border">Nominal</th>
+        {/* Table */}
+        <table className="min-w-full border-collapse border border-gray-300">
+          <thead>
+            <tr>
+              <th className="border border-gray-300 p-2">No</th>
+              <th className="border border-gray-300 p-2">Siswa</th>
+              <th className="border border-gray-300 p-2">Bulan</th>
+              <th className="border border-gray-300 p-2">Nominal</th>
+              <th className="border border-gray-300 p-2">Status</th>
+              <th className="border border-gray-300 p-2">Tanggal Bayar</th>
+              {/* <th className="border border-gray-300 p-2">Keterangan</th> */}
+            </tr>
+          </thead>
+          <tbody>
+            {filteredPayments.length === 0 && (
+              <tr>
+                <td colSpan={6} className="text-center p-4">Tidak ada data pembayaran.</td>
               </tr>
-            </thead>
-            <tbody>
-              {filteredPayments.map((payment) => (
-                <tr key={payment.id} className="hover:bg-gray-50 dark:hover:bg-neutral-700">
-                  <td className="p-3 border">{payment.student.nama}</td>
-                  <td className="p-3 border">{payment.bulan}</td>
-                  <td className="p-3 border">{payment.status}</td>
-                  <td className="p-3 border">{payment.nominal}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            )}
+            {filteredPayments.map((p, i) => (
+              <tr key={p.id} className="text-center">
+                <td className="border border-gray-300 p-2">{i + 1}</td>
+                <td className="border border-gray-300 p-2">{p.student.nama}</td>
+                <td className="border border-gray-300 p-2">{p.bulan}</td>
+                <td className="border border-gray-300 p-2">Rp{Number(p.nominal).toLocaleString('id-ID')}</td>
+                <td className="border border-gray-300 p-2">{p.status === 'lunas' ? 'Lunas' : 'Belum Lunas'}</td>
+                <td className="border border-gray-300 p-2">{new Date(p.created_at).toLocaleDateString()}</td>
+                {/* <td className="border border-gray-300 p-2">{p.keterangan ?? '-'}</td> */}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </AppLayout>
   );

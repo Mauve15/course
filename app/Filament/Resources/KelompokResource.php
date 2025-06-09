@@ -33,7 +33,9 @@ class KelompokResource extends Resource
                 Forms\Components\TextInput::make('hari')
                     ->required()
                     ->maxLength(50),
-                Forms\Components\TimePicker::make('jam')
+                Forms\Components\TimePicker::make('jam_mulai')
+                    ->required(),
+                Forms\Components\TimePicker::make('jam_selesai')
                     ->required(),
             ]);
     }
@@ -44,7 +46,8 @@ class KelompokResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nama_kelompok')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('hari')->sortable(),
-                Tables\Columns\TextColumn::make('jam')->label('Jam Mulai')->sortable(),
+                Tables\Columns\TextColumn::make('jam_mulai')->label('Jam Mulai')->sortable(),
+                Tables\Columns\TextColumn::make('jam_selesai')->label('Jam Selesai')->sortable(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
             ])
             // ->defaultSort('nama_kelompok');

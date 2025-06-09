@@ -21,13 +21,19 @@ interface Jadwal {
   materi: string;
 }
 
+interface User {
+  id: number;
+  role: string;
+}
+
 interface Props {
   rekaps: Rekap[];
   students: Student[];
   jadwals: Jadwal[];
+   users: User;
 }
 
-export default function RekapPage({ rekaps, students, jadwals }: Props) {
+export default function RekapPage({ rekaps, students, jadwals, users }: Props) {
   const { data, setData, post, processing, errors, reset } = useForm({
     student_id: '',
     jadwal_id: '',
@@ -47,18 +53,21 @@ export default function RekapPage({ rekaps, students, jadwals }: Props) {
   return (
     <AppLayout>
     <div className="p-6 max-w-5xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Input & Daftar Rekap</h1>
-
+<h1 className="text-3xl font-bold mb-6">Nilai Siswa</h1>      
       {/* Form Input */}
+      {users.role !== 'siswa' && (
+
       <form onSubmit={handleSubmit} className="mb-10 space-y-4 max-w-xl">
+<h1 className="text-2xl font-bold mb-6">Input & Daftar Rekap</h1>
+
         <div>
-          <label className="block mb-1 font-semibold">Mahasiswa</label>
+          <label className="block mb-1 font-semibold">Siswa</label>
           <select
             value={data.student_id}
             onChange={(e) => setData('student_id', e.target.value)}
             className="w-full border px-3 py-2"
           >
-            <option value="">Pilih Mahasiswa</option>
+            <option value="">Pilih Siswa</option>
             {students.map((student) => (
               <option key={student.id} value={student.id}>
                 {student.nama}
@@ -126,12 +135,13 @@ export default function RekapPage({ rekaps, students, jadwals }: Props) {
           Simpan
         </button>
       </form>
+)}
 
       {/* Tabel Daftar Rekap */}
       <table className="w-full border border-gray-300">
         <thead>
           <tr className="bg-gray-200">
-            <th className="p-2 border-b border-gray-300">Mahasiswa</th>
+            <th className="p-2 border-b border-gray-300">Siswa</th>
             <th className="p-2 border-b border-gray-300">Jadwal</th>
             <th className="p-2 border-b border-gray-300">Absen</th>
             <th className="p-2 border-b border-gray-300">Score</th>

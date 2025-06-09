@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('asal_sekolah');
             $table->enum('gender', ['L', 'P']);
             $table->string('contact');
-            $table->foreignId('kelompok_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('kelompok_id')->nullable()->constrained('kelompoks')->onDelete('cascade');
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
             $table->timestamps();
         });

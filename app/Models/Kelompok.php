@@ -12,7 +12,8 @@ class Kelompok extends Model
     protected $fillable = [
         'nama_kelompok',
         'hari',
-        'jam',
+        'jam_mulai',
+        'jam_selesai',
     ];
 
     public function registrations()

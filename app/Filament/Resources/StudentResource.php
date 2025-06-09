@@ -28,9 +28,14 @@ class StudentResource extends Resource
         return $form
             ->schema([
 
-                Forms\Components\TextInput::make('nama')
+                Forms\Components\Select::make('user_id')
+                    ->label('Nama')
                     ->required()
-                    ->maxLength(255),
+                    ->options(function () {
+                        return \App\Models\User::where('role', 'user')->pluck('name', 'id');
+                    })
+                    ->searchable(),
+
                 Forms\Components\Textarea::make('alamat')
                     ->required(),
                 Forms\Components\TextInput::make('tempat_lahir')
@@ -57,10 +62,14 @@ class StudentResource extends Resource
                 Forms\Components\TextInput::make('contact')
                     ->required()
                     ->maxLength(50),
-                Forms\Components\Select::make('user_id')
-                    ->label('Role User')
-                    // ->required()
-                    ->relationship('user', 'role'),
+                Select::make('user.role')
+                    ->label('Role')
+                    ->options([
+                        'siswa' => 'Siswa',
+                        'admin' => 'Admin',
+                        'guru' => 'Guru',
+                    ])
+                    ->required(),
             ]);
     }
 

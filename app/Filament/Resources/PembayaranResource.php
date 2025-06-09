@@ -9,18 +9,12 @@ use Filament\Forms\Form;
 use App\Models\Pembayaran;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\Select;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\PembayaranResource\Pages;
-use App\Filament\Resources\PembayaranResource\RelationManagers;
 
 class PembayaranResource extends Resource
 {
     protected static ?string $model = Pembayaran::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
@@ -31,19 +25,38 @@ class PembayaranResource extends Resource
                     ->label('Siswa')
                     ->options(Student::all()->pluck('nama', 'id'))
                     ->required(),
-                Forms\Components\DatePicker::make('bulan')
-                    ->required()
-                    ->displayFormat('F Y'),
+
+                Forms\Components\Select::make('bulan')
+                    ->label('Bulan')
+                    ->options([
+                        '01' => 'Januari',
+                        '02' => 'Februari',
+                        '03' => 'Maret',
+                        '04' => 'April',
+                        '05' => 'Mei',
+                        '06' => 'Juni',
+                        '07' => 'Juli',
+                        '08' => 'Agustus',
+                        '09' => 'September',
+                        '10' => 'Oktober',
+                        '11' => 'November',
+                        '12' => 'Desember',
+                    ])
+                    ->required(),
+
                 Forms\Components\TextInput::make('nominal')
                     ->required()
                     ->numeric(),
+
                 Forms\Components\Select::make('status')
+                    ->label('Status')
                     ->options([
                         'lunas' => 'Lunas',
                         'belum' => 'Belum Lunas',
                     ])
                     ->default('belum')
                     ->required(),
+
                 Forms\Components\Textarea::make('keterangan')
                     ->maxLength(255),
             ]);
@@ -55,23 +68,38 @@ class PembayaranResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')->label('ID')->sortable(),
                 Tables\Columns\TextColumn::make('student.nama')->label('Siswa')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('bulan')->label('Bulan')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('bulan')
+                    ->label('Bulan')
+                    ->formatStateUsing(fn($state) => match ($state) {
+                        '01' => 'Januari',
+                        '02' => 'Februari',
+                        '03' => 'Maret',
+                        '04' => 'April',
+                        '05' => 'Mei',
+                        '06' => 'Juni',
+                        '07' => 'Juli',
+                        '08' => 'Agustus',
+                        '09' => 'September',
+                        '10' => 'Oktober',
+                        '11' => 'November',
+                        '12' => 'Desember',
+                        default => $state,
+                    }),
                 Tables\Columns\TextColumn::make('nominal')->label('Nominal')->money('idr', true),
                 Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
                     ->formatStateUsing(fn($state) => [
                         'lunas' => 'Lunas',
                         'belum' => 'Belum Lunas',
                     ][$state] ?? $state)
-                    ->badge() // opsional: jika ingin tampilan seperti badge
+                    ->badge()
                     ->color(fn($state) => match ($state) {
                         'lunas' => 'success',
                         'belum' => 'warning',
                         default => 'gray',
-                    })
-                    ->label('Status'),
-
+                    }),
                 Tables\Columns\TextColumn::make('keterangan')->label('Keterangan'),
-                Tables\Columns\TextColumn::make('created_at')->dateTime()->label('Tanggal Bayar'),
+                Tables\Columns\TextColumn::make('created_at')->label('Tanggal Bayar')->dateTime(),
             ])
             ->filters([
                 //
@@ -80,9 +108,7 @@ class PembayaranResource extends Resource
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 

@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('nama_kelompok');
             $table->string('hari'); // bisa diubah jadi enum jika terbatas
-            $table->time('jam');
+            $table->time('jam_mulai');
+            $table->time('jam_selesai');
             $table->timestamps();
         });
     }

@@ -16,13 +16,30 @@ class StudentController extends Controller
      */
     public function index()
     {
-        // Pastikan eager load relasi kelompok
-        $students = Student::with('kelompok')->get();
+        $user = Auth::user();
+
+        if ($user->role === 'siswa') {
+            // Mahasiswa hanya lihat datanya sendiri
+            $students = Student::with('kelompok')
+                ->where('user_id', $user->id)
+                ->get();
+        } elseif ($user->role === 'pengajar') {
+            // Pengajar hanya lihat siswa dari kelompok yang dia ajar
+            $kelompokIds = \App\Models\Jadwal::where('pengajar', $user->id)->pluck('kelompok_id');
+
+            $students = Student::with('kelompok')
+                ->whereIn('kelompok_id', $kelompokIds)
+                ->get();
+        } else {
+            // Admin bisa lihat semua siswa
+            $students = Student::with('kelompok')->get();
+        }
 
         return Inertia::render('student', [
             'students' => $students,
         ]);
     }
+
     public function create()
     {
         // Kita kirim juga data kelompok ke view supaya bisa dipilih di form
@@ -63,5 +80,21 @@ class StudentController extends Controller
         ]);
 
         return redirect()->route('create')->with('message', 'Pendaftaran berhasil! Tunggu konfirmasi admin.');
+    }
+    public function update(Request $request, Student $student)
+    {
+        $request->validate([
+            'role' => 'required|in:siswa,admin,guru', // dll
+        ]);
+
+        // Update data student
+        $student->update($request->all());
+
+        // Sinkronkan role ke tabel users
+        $student->user->update([
+            'role' => $request->role
+        ]);
+
+        return redirect()->back()->with('success', 'Data berhasil diperbarui!');
     }
 }

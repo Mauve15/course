@@ -46,7 +46,7 @@ class JadwalResource extends Resource
                 //     ->label('Jam')
                 //     ->native(false)
                 //     ->displayFormat('H:i'),
-                Forms\Components\TextInput::make('materi')
+                Forms\Components\Textarea::make('materi')
                     ->required()
                     ->maxLength(255),
             ]);

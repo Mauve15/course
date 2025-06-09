@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Inertia\Inertia;
 use App\Models\Jadwal;
+use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class JadwalController extends Controller
 {
@@ -13,15 +15,30 @@ class JadwalController extends Controller
      */
     public function index()
     {
-        // Pastikan eager load relasi kelompok (dan guru jika perlu)
-        $jadwals = Jadwal::with(['kelompok', 'user'])->get();
+        $user = Auth::user();
+
+        if ($user->role === 'pengajar') {
+            // Pengajar hanya bisa melihat jadwal yang dia ajar
+            $jadwals = Jadwal::with(['kelompok', 'pengajarUser:id,name'])
+                ->where('pengajar', $user->id)
+                ->get();
+        } elseif ($user->role === 'siswa') {
+            // Siswa: ambil kelompok_id dari tabel students
+            $student = Student::where('user_id', $user->id)->first();
+            $jadwals = $student
+                ? Jadwal::with(['kelompok', 'pengajarUser:id,name'])
+                ->where('kelompok_id', $student->kelompok_id)
+                ->get()
+                : collect(); // Kosong jika tidak ditemukan
+        } else {
+            // Admin (atau default): lihat semua jadwal
+            $jadwals = Jadwal::with(['kelompok', 'pengajarUser:id,name'])->get();
+        }
 
         return Inertia::render('jadwal', [
-            'jadwals' => Jadwal::with(['kelompok', 'user:id,name'])->get(),
+            'jadwals' => $jadwals,
         ]);
     }
-
-
 
     /**
      * Show the form for creating a new resource.
@@ -38,8 +55,7 @@ class JadwalController extends Controller
     {
         $request->validate([
             'kelompok_id' => 'required|exists:kelompoks,id',
-            'user_id' => 'required|exists:users,id',
-            'pengajar' => 'required|string|max:255',
+            'pengajar' => 'required|exists:users,id',
         ]);
 
         $jadwal = Jadwal::create($request->all());
@@ -62,8 +78,8 @@ class JadwalController extends Controller
      */
     public function edit(string $id)
     {
-
         $jadwal = Jadwal::findOrFail($id);
+
         return response()->json($jadwal);
     }
 
@@ -76,7 +92,7 @@ class JadwalController extends Controller
 
         $request->validate([
             'kelompok_id' => 'required|exists:kelompoks,id',
-            'user_id' => 'required|exists:users,id',
+            'pengajar' => 'required|exists:users,id',
         ]);
 
         $jadwal->update($request->all());
@@ -90,7 +106,6 @@ class JadwalController extends Controller
     public function destroy(string $id)
     {
         $jadwal = Jadwal::findOrFail($id);
-
         $jadwal->delete();
 
         return response()->json(['message' => 'Jadwal berhasil dihapus']);
